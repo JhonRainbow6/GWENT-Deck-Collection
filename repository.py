@@ -31,3 +31,16 @@ class CsvRepository:
                 items.append(self.model(**row))
         return items
 
+    def delete(self, **conditions):
+        items = self.get_all()
+        items_to_keep = []
+        for item in items:
+            match = all(str(getattr(item, k)) == str(v) for k, v in conditions.items())
+            if not match:
+                items_to_keep.append(item)
+
+        with open(self.filename, mode='w', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=self.fieldnames)
+            writer.writeheader()
+            for item in items_to_keep:
+                writer.writerow(item.model_dump())

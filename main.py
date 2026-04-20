@@ -49,4 +49,18 @@ def create_card(card: Card):
 def get_cards():
     return card_repo.get_all()
 
+#endpoints de mazos
+@app.post("/decks", summary="Crear una nueva baraja")
+def create_deck(deck: Deck):
+    deck_repo.save(deck)
+    return {"message": "Baraja creada", "deck": deck}
+
+@app.delete("/decks/{deck_id}", summary="Eliminar una baraja")
+def delete_deck(deck_id: int):
+    # eliminar la baraja con sus cartas
+    deck_repo.delete(id=deck_id)
+    deck_card_repo.delete(deck_id=deck_id)
+    return {"message": f"Baraja {deck_id} y sus cartas han sido eliminadas."}
+
+
 
