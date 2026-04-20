@@ -62,5 +62,14 @@ def delete_deck(deck_id: int):
     deck_card_repo.delete(deck_id=deck_id)
     return {"message": f"Baraja {deck_id} y sus cartas han sido eliminadas."}
 
+#endpoints de cartas en mazo
+@app.post("/decks/cards", summary="Añadir cartas a una baraja")
+def add_card_to_deck(deck_card: DeckCard):
+    deck_card_repo.save(deck_card)
+    return {"message": "Carta(s) agregada(s) a la baraja", "deck_card": deck_card}
 
+@app.delete("/decks/{deck_id}/cards/{card_id}", summary="Eliminar carta de una baraja")
+def remove_card_from_deck(deck_id: int, card_id: int):
+    deck_card_repo.delete(deck_id=deck_id, card_id=card_id)
+    return {"message": f"Carta {card_id} eliminada de la baraja {deck_id}."}
 
