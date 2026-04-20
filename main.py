@@ -73,3 +73,17 @@ def remove_card_from_deck(deck_id: int, card_id: int):
     deck_card_repo.delete(deck_id=deck_id, card_id=card_id)
     return {"message": f"Carta {card_id} eliminada de la baraja {deck_id}."}
 
+# endpoints validacion de mazo
+@app.get("/decks/{deck_id}/validate", summary="Validar si una baraja cumple las reglas")
+def validate_deck_endpoint(deck_id: int):
+    decks = deck_repo.get_all()
+    deck = next((d for d in decks if d.id == deck_id), None)
+    if not deck:
+        raise HTTPException(status_code=404, detail="Baraja no encontrada")
+
+    deck_cards = [dc for dc in deck_card_repo.get_all() if dc.deck_id == deck_id]
+    all_cards = card_repo.get_all()
+
+    resultado = validate_gwent_deck(deck, deck_cards, all_cards)
+    return {"validacion": resultado}
+
