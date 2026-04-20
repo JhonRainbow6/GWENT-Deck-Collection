@@ -9,3 +9,13 @@ class Card(BaseModel):
     faction: str
     ability: str
 
+class Deck(BaseModel):
+    id: int
+    name: str
+    faction: str
+    leader_id: int
+
+class DeckCard(BaseModel):
+    deck_id: int
+    card_id: int
+    quantity: int
