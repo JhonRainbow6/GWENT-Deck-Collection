@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from model import Card, Deck, DeckCard
 from repository import CsvRepository
-from typing import List
+from typing import List, Optional
 
 app = FastAPI(title="Gwent Collection API")
 
@@ -45,9 +45,29 @@ def create_card(card: Card):
     card_repo.save(card)
     return {"message": "Carta guardada exitosamente", "card": card}
 
-@app.get("/cards", response_model=List[Card], summary="Obtener todas las cartas")
-def get_cards():
-    return card_repo.get_all()
+@app.get("/cards", response_model=List[Card], summary="Obtener todas las cartas o filtarlas")
+def get_cards(
+        faction: Optional[str] = None,
+        type: Optional[str] = None,
+        power: Optional[int] = None,
+        row: Optional[str] = None
+):
+    all_cards = card_repo.get_all()
+    filtered_cards = []
+
+    # filtros
+    for card in all_cards:
+        if faction and card.faction.lower() != faction.lower():
+            continue
+        if type and card.type.lower() != type.lower():
+            continue
+        if power is not None and card.power != power:
+            continue
+        if row and card.row.lower() != row.lower():
+            continue
+        filtered_cards.append(card)
+
+    return filtered_cards
 
 #endpoints de mazos
 @app.post("/decks", summary="Crear una nueva baraja")
