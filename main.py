@@ -88,6 +88,24 @@ def add_card_to_deck(deck_card: DeckCard):
     deck_card_repo.save(deck_card)
     return {"message": "Carta(s) agregada(s) a la baraja", "deck_card": deck_card}
 
+@app.get("/decks/{deck_id}/cards", summary="Obtener las cartas de una baraja específica")
+def get_cards_from_deck(deck_id: int):
+    decks = deck_repo.get_all()
+    deck = next((d for d in decks if d.id == deck_id), None)
+    if not deck:
+        raise HTTPException(status_code=404, detail="Baraja no encontrada")
+    deck_cards = [dc for dc in deck_card_repo.get_all() if dc.deck_id == deck_id]
+    all_cards = {c.id: c for c in card_repo.get_all()}
+    result = []
+    for dc in deck_cards:
+        card = all_cards.get(dc.card_id)
+        if card:
+            card_data = card.dict()
+            card_data["quantity"] = dc.quantity
+            result.append(card_data)
+
+    return result
+
 @app.delete("/decks/{deck_id}/cards/{card_id}", summary="Eliminar carta de una baraja")
 def remove_card_from_deck(deck_id: int, card_id: int):
     deck_card_repo.delete(deck_id=deck_id, card_id=card_id)
