@@ -47,6 +47,7 @@ def create_card(card: Card):
 
 @app.get("/cards", response_model=List[Card], summary="Obtener todas las cartas o filtarlas")
 def get_cards(
+        id: Optional[int] = None,
         faction: Optional[str] = None,
         type: Optional[str] = None,
         power: Optional[int] = None,
@@ -57,6 +58,8 @@ def get_cards(
 
     # filtros
     for card in all_cards:
+        if id is not None and card.id !=id:
+            continue
         if faction and card.faction.lower() != faction.lower():
             continue
         if type and card.type.lower() != type.lower():
@@ -68,6 +71,12 @@ def get_cards(
         filtered_cards.append(card)
 
     return filtered_cards
+
+@app.delete("/cards/{card_id}", summary = "Eliminar carta por ID")
+def delete_card(card_id: int):
+    deck_card_repo.delete(card_id=card_id)  # eliminar en mazos
+    card_repo.delete(id=card_id)  # eliminar la carta
+    return {"message": f"Carta {card_id} y sus referencias en mazos han sido eliminado."}
 
 #endpoints de mazos
 @app.post("/decks", summary="Crear una nueva baraja")
