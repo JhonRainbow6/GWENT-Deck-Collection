@@ -2,3 +2,5 @@ cards.csv
 deck_cards.csv
 decks.csv
 .idea
+.env
+test_main.py
