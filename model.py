@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from sqlalchemy import Column, Integer, String, ForeignKey
 from database import Base
+from typing import Optional
 
 #modelos neon
 class DBCard(Base):
@@ -12,6 +13,7 @@ class DBCard(Base):
     row = Column(String)
     faction = Column(String)
     ability = Column(String)
+    image_url = Column(String, nullable=True)
 
 class DBDeck(Base):
     __tablename__ = "decks"
@@ -36,6 +38,7 @@ class Card(BaseModel):
     row: str
     faction: str
     ability: str
+    image_url: Optional[str]
     class Config: from_attributes = True
 
 class Deck(BaseModel):

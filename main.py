@@ -4,6 +4,8 @@ from model import Card, Deck, DeckCard, DBCard, DBDeck, DBDeckCard
 from repository import DBRepository
 from database import engine, Base, get_db
 from typing import List, Optional
+from fastapi import UploadFile, File, Form
+from database import supabase, SUPABASE_BUCKET
 
 Base.metadata.create_all(bind=engine)
 
@@ -48,6 +50,46 @@ def validate_gwent_deck(deck: Deck, deck_cards: list[DeckCard], all_cards: list[
 def create_card(card: Card, db:Session = Depends(get_db)):
     card_repo.save(db, item_data=card.model_dump())
     return {"message": "Carta guardada exitosamente", "card": card}
+
+@app.post("/cards/{card_id}/image", summary="Subir imagen a carta existente")
+def upload_card_image(card_id: int, file: UploadFile = File(...), db: Session = Depends(get_db)):
+    # 1. Comprobar que la carta existe
+    card_query = db.query(DBCard).filter(DBCard.id == card_id)
+    card = card_query.first()
+    if not card:
+        raise HTTPException(status_code=404, detail="Carta no encontrada")
+
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Configuración de Supabase no encontrada")
+
+    # 2. Leer el archivo y crear un path único para Supabase
+    file_bytes = file.file.read()
+    file_ext = file.filename.split('.')[-1]
+    file_path = f"cards/{card_id}_image.{file_ext}"
+
+    # 3. Subir el archivo al bucket de Supabase
+    try:
+        res = supabase.storage.from_(SUPABASE_BUCKET).upload(
+            file=file_bytes,
+            path=file_path,
+            file_options={"content-type": file.content_type, "upsert": "true"}
+            # Upsert permite sobreescribir si ya existe
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error subiendo la imagen: {str(e)}")
+
+    # 4. Obtener la URL pública del archivo subido
+    public_url_response = supabase.storage.from_(SUPABASE_BUCKET).get_public_url(file_path)
+
+    if public_url_response:
+        # Guardar la URL en la base de datos Neon (usando tu repo)
+        card.image_url = public_url_response
+        db.commit()
+        db.refresh(card)
+        return {"message": "Imagen subida exitosamente", "image_url": public_url_response}
+
+    raise HTTPException(status_code=500, detail="No se pudo obtener la URL del archivo")
+
 
 @app.get("/cards", response_model=List[Card], summary="Obtener todas las cartas o filtarlas")
 def get_cards(
