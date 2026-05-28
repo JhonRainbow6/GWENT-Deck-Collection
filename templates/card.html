@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ card.name }} - Gwent Card</title>
+</head>
+<body>
+    <h1>Nombre de la Carta: {{ card.name }}</h1>
+    <br>
+    <h3>Facción: {{ card.faction }}</h3>
+    <h4>ID: {{ card.id }}</h4>
+    <br>
+    <h3>Poder: {{ card.power }}</h3>
+    <h3>Tipo: {{ card.type }}</h3>
+    <p><strong>Habilidad:</strong> {{ card.ability }}</p>
+
+    {% if card.image_url %}
+        <br>
+        <img src="{{ card.image_url }}" alt="Imagen de {{ card.name }}" style="max-width: 300px;">
+    {% else %}
+        <p><i>Esta carta aún no tiene imagen.</i></p>
+    {% endif %}
+    <br>
+    <a href="/">Volver a la colección</a>
+</body>
+</html>

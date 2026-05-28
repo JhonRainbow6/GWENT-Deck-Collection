@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gwent Collection</title>
+</head>
+<body>
+    <h1>Toda la colección de cartas</h1>
+    <hr>
+    <ul>
+        {% for c in cards %}
+            <li>
+                <strong>{{ c.name }}</strong> ({{ c.faction }} - {{ c.type }}) | Poder: {{ c.power }}
+                <a href="/cards_html/{{ c.id }}">Ver detalles</a>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

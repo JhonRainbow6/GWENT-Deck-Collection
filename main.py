@@ -1,14 +1,15 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, UploadFile, File, Form, Request
 from sqlalchemy.orm import Session
 from model import Card, Deck, DeckCard, DBCard, DBDeck, DBDeckCard
 from repository import DBRepository
 from database import engine, Base, get_db
 from typing import List, Optional
-from fastapi import UploadFile, File, Form
 from database import supabase, SUPABASE_BUCKET
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 
 Base.metadata.create_all(bind=engine)
-
+templates = Jinja2Templates(directory="templates")
 app = FastAPI(title="Gwent Collection API")
 
 card_repo = DBRepository(DBCard)
@@ -184,3 +185,25 @@ def validate_deck_endpoint(deck_id: int, db: Session = Depends(get_db)):
     resultado = validate_gwent_deck(deck, deck_cards, all_cards)
     return {"validacion": resultado}
 
+
+@app.get("/cards_html/{card_id}", response_class=HTMLResponse, summary="Ver una carta en HTML")
+def get_card_html(request: Request, card_id: int, db: Session = Depends(get_db)):
+    # Buscamos la carta en la base de datos usando el modelo de Neon DB
+    card = db.query(DBCard).filter(DBCard.id == card_id).first()
+    if not card:
+        raise HTTPException(status_code=404, detail="Carta no encontrada")
+
+    # Renderizamos la plantilla enviando los datos de la carta
+    return templates.TemplateResponse("card.html", {
+        "request": request,
+        "card": card
+    })
+
+
+@app.get("/", response_class=HTMLResponse, summary="Ver lista de cartas en HTML")
+def all_cards_html(request: Request, db: Session = Depends(get_db)):
+    cards = db.query(DBCard).all()
+    return templates.TemplateResponse("cards_list.html", {
+        "request": request,
+        "cards": cards
+    })
