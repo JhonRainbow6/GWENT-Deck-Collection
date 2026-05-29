@@ -185,6 +185,10 @@ def validate_deck_endpoint(deck_id: int, db: Session = Depends(get_db)):
     resultado = validate_gwent_deck(deck, deck_cards, all_cards)
     return {"validacion": resultado}
 
+
+
+
+
 # HTML endpoints
 
 #Cards
@@ -200,9 +204,28 @@ def get_card_html(request: Request, card_id: int, db: Session = Depends(get_db))
     })
 
 
-@app.get("/", response_class=HTMLResponse, summary="Ver lista de cartas en HTML")
-def all_cards_html(request: Request, db: Session = Depends(get_db)):
-    cards = db.query(DBCard).all()
+@app.get("/", response_class=HTMLResponse, summary="Dashboard")
+def all_cards_and_decks_html(
+        request: Request,
+        id: Optional[str] = None,
+        faction: Optional[str] = None,
+        type: Optional[str] = None,
+        power: Optional[str] = None,
+        row: Optional[str] = None,
+        db: Session = Depends(get_db)
+):
+    query = db.query(DBCard)
+    if id and id.strip():
+        query = query.filter(DBCard.id == int(id))
+    if faction and faction != "All":
+        query = query.filter(DBCard.faction.ilike(faction))
+    if type and type != "All":
+        query = query.filter(DBCard.type.ilike(type))
+    if power and power.strip():
+        query = query.filter(DBCard.power == int(power))
+    if row and row != "All":
+        query = query.filter(DBCard.row.ilike(row))
+    cards = query.all()
     decks = db.query(DBDeck).all()
     return templates.TemplateResponse("cards_list.html", {
         "request": request,
