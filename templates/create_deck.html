@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear Nuevo Mazo</title>
+</head>
+<body>
+    <h1>Crear un nuevo Mazo de Gwent</h1>
+    <hr>
+    <form action="/decks_form" method="POST">
+
+        <label for="id">ID del Mazo:</label><br>
+        <input type="number" id="id" name="id" required><br><br>
+
+        <label for="name">Nombre del Mazo:</label><br>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <!-- Menú desplegable para la Facción -->
+        <label for="faction">Facción:</label><br>
+        <select id="faction" name="faction" required>
+            <option value="Northern Realms">Northern Realms</option>
+            <option value="Monsters">Monsters</option>
+            <option value="Nilfgaardian Empire">Nilfgaardian Empire</option>
+            <option value="Scoia'tael">Scoia'tael</option>
+            <option value="Skellige">Skellige</option>
+        </select><br><br>
+
+        <!-- Menú desplegable para el Líder, llenado dinámicamente -->
+        <label for="leader_id">Carta de Líder:</label><br>
+        <select id="leader_id" name="leader_id" required>
+            <option value="" disabled selected>-- Elige un líder --</option>
+            <!-- Jinja llenará esta sección con las cartas de tipo "Leader" -->
+            {% for leader in leaders %}
+                <option value="{{ leader.id }}">{{ leader.name }} (Facción: {{ leader.faction }})</option>
+            {% endfor %}
+        </select><br><br>
+
+        <button type="submit">Crear Mazo</button>
+    </form>
+
+    <br>
+    <a href="/">Volver a la colección de cartas</a>
+</body>
+</html>

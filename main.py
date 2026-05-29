@@ -187,6 +187,7 @@ def validate_deck_endpoint(deck_id: int, db: Session = Depends(get_db)):
 
 # HTML endpoints
 
+#Cards
 @app.get("/cards_html/{card_id}", response_class=HTMLResponse, summary="Ver una carta en HTML")
 def get_card_html(request: Request, card_id: int, db: Session = Depends(get_db)):
     card = db.query(DBCard).filter(DBCard.id == card_id).first()
@@ -318,4 +319,45 @@ def delete_card_html(card_id: int, db: Session = Depends(get_db)):
     deck_card_repo.delete(db, card_id=card_id)
     card_repo.delete(db, id=card_id)
 
+    return RedirectResponse(url="/", status_code=303)
+
+#Decks
+@app.get("/create_deck", response_class=HTMLResponse, summary="Formulario para crear un mazo")
+def show_create_deck_form(request: Request, db: Session = Depends(get_db)):
+    #listar las cartas leader
+    leader_cards = db.query(DBCard).filter(DBCard.type.ilike("leader")).all()
+
+    return templates.TemplateResponse("create_deck.html", {
+        "request": request,
+        "leaders": leader_cards
+    })
+
+
+@app.post("/decks_form", summary="Procesar formulario de mazo y guardar en DB")
+def create_deck_from_form(
+        id: int = Form(...),
+        name: str = Form(...),
+        faction: str = Form(...),
+        leader_id: int = Form(...),
+        db: Session = Depends(get_db)
+):
+    # verifica que la carta leader exista y sea de la faccion correcta
+    leader_card = db.query(DBCard).filter(DBCard.id == leader_id).first()
+    if not leader_card or leader_card.type.lower() != 'leader':
+        # Esto es una validación de seguridad por si el formulario es manipulado
+        raise HTTPException(status_code=400, detail="El ID de líder seleccionado no es válido.")
+
+    #faccion del mazo debe ser igual a la faccion del leader
+    if leader_card.faction != faction:
+        raise HTTPException(status_code=400,
+                            detail=f"La facción del mazo ({faction}) no coincide con la facción del líder ({leader_card.faction}).")
+
+    deck_data = {
+        "id": id,
+        "name": name,
+        "faction": faction,
+        "leader_id": leader_id
+    }
+
+    deck_repo.save(db, item_data=deck_data)
     return RedirectResponse(url="/", status_code=303)

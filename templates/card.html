@@ -24,8 +24,6 @@
 
     <br><br>
     <a href="/edit_card/{{ card.id }}"><button>Editar Carta</button></a>
-
-    <!-- Para eliminar, HTML no permite links con método DELETE, así que usamos un pequeño form -->
     <form action="/cards_html/{{ card.id }}/delete" method="POST" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta carta?');">
         <button type="submit" style="color: red;">Eliminar Carta</button>
     </form>
