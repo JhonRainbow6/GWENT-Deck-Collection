@@ -2,20 +2,56 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Gwent Collection</title>
+    <title>Gwent Dashboard</title>
+    <style>
+        .container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .column {
+            width: 48%;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Toda la colección de cartas</h1>
-    <a href="/create_card"><button>Registrar Nueva Carta</button></a>
-    <a href="/create_deck"><button>Crear Nuevo Mazo</button></a>
+    <h1>Colección de Gwent</h1>
     <hr>
-    <ul>
-        {% for c in cards %}
-            <li>
-                <strong>{{ c.name }}</strong> ({{ c.faction }} - {{ c.type }}) | Poder: {{ c.power }}
-                <a href="/cards_html/{{ c.id }}">Ver detalles</a>
-            </li>
-        {% endfor %}
-    </ul>
+
+    <div class="container">
+        <div class="column">
+            <h2>Colección de Cartas</h2>
+            <a href="/create_card"><button>Registrar Nueva Carta</button></a>
+            <hr>
+            <ul>
+                {% for c in cards %}
+                    <li>
+                        <strong>{{ c.name }}</strong> ({{ c.faction }} - {{ c.type }}) | Poder: {{ c.power }}
+                        <a href="/cards_html/{{ c.id }}">Ver detalles</a>
+                    </li>
+                {% else %}
+                    <p>No tienes cartas registradas.</p>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="column">
+            <h2>Tus Barajas (Decks)</h2>
+            <a href="/create_deck"><button>Crear Nueva Baraja</button></a>
+            <hr>
+            <ul>
+                {% for d in decks %}
+                    <li>
+                        <strong>{{ d.name }}</strong> (Facción: {{ d.faction }})
+                        <a href="/decks_html/{{ d.id }}">Ver detalles del mazo</a>
+                    </li>
+                {% else %}
+                    <p>No has creado ninguna baraja aún.</p>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 </body>
 </html>
