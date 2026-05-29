@@ -7,7 +7,6 @@
 <body>
     <h1>Registrar nueva carta de Gwent</h1>
     <hr>
-    <!-- IMPORTANTE: Añadir enctype para permitir envío de imágenes -->
     <form action="/cards_form" method="POST" enctype="multipart/form-data">
 
         <label for="id">ID de la carta:</label><br>
@@ -19,19 +18,50 @@
         <label for="power">Poder:</label><br>
         <input type="number" id="power" name="power" required><br><br>
 
-        <label for="type">Tipo (Hero, Unit, Special, Leader):</label><br>
-        <input type="text" id="type" name="type" required><br><br>
+        <label for="type">Tipo:</label><br>
+        <select id="type" name="type" required>
+            <option value="Unit">Unit</option>
+            <option value="Hero">Hero</option>
+            <option value="Leader">Leader</option>
+            <option value="Weather">Weather</option>
+            <option value="Special">Special</option>
+        </select><br><br>
 
-        <label for="row">Fila (Melee, Ranged, Siege, Any):</label><br>
-        <input type="text" id="row" name="row" required><br><br>
+        <label for="row">Línea (Fila):</label><br>
+        <select id="row" name="row" required>
+            <option value="Melee">Melee</option>
+            <option value="Range">Range</option>
+            <option value="Siege">Siege</option>
+            <option value="Agile(Melee+Range)">Agile (Melee+Range)</option>
+            <option value="None">Ninguna (Leader/Weather/Special)</option>
+        </select><br><br>
 
         <label for="faction">Facción:</label><br>
-        <input type="text" id="faction" name="faction" required><br><br>
+        <select id="faction" name="faction" required>
+            <option value="Northern Realms">Northern Realms</option>
+            <option value="Monsters">Monsters</option>
+            <option value="Nilfgaardian Empire">Nilfgaardian Empire</option>
+            <option value="Scoia'tael">Scoia'tael</option>
+            <option value="Neutral">Neutral</option>
+            <option value="Skellige">Skellige</option>
+        </select><br><br>
 
         <label for="ability">Habilidad:</label><br>
-        <input type="text" id="ability" name="ability" required><br><br>
+        <select id="ability" name="ability" required>
+            <option value="Ninguna">Ninguna</option>
+            <option value="Berserker">Berserker</option>
+            <option value="Commander Horn">Commander Horn</option>
+            <option value="Decoy">Decoy</option>
+            <option value="Hero">Hero</option>
+            <option value="Medic">Medic</option>
+            <option value="Morale Boost">Morale Boost</option>
+            <option value="Mardroeme">Mardroeme</option>
+            <option value="Muster">Muster</option>
+            <option value="Scorch">Scorch</option>
+            <option value="Spy">Spy</option>
+            <option value="Tight Bond">Tight Bond</option>
+        </select><br><br>
 
-        <!-- Nuevo campo para subir la imagen -->
         <label for="image">Imagen de la carta:</label><br>
         <input type="file" id="image" name="image" accept="image/*"><br><br>
 
