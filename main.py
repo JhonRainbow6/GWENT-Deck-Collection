@@ -258,3 +258,64 @@ def create_card_from_form(
 
     card_repo.save(db, item_data=card_data)
     return RedirectResponse(url="/", status_code=303)
+
+
+@app.get("/edit_card/{card_id}", response_class=HTMLResponse, summary="Formulario para editar carta")
+def show_edit_card_form(request: Request, card_id: int, db: Session = Depends(get_db)):
+    card = db.query(DBCard).filter(DBCard.id == card_id).first()
+    if not card:
+        raise HTTPException(status_code=404, detail="Carta no encontrada")
+
+    return templates.TemplateResponse("edit_card.html", {"request": request, "card": card})
+
+
+@app.post("/cards_edit_form/{card_id}", summary="Procesar formulario de edición y guardar en DB")
+def edit_card_from_form(
+        card_id: int,
+        power: int = Form(...),
+        name: str = Form(...),
+        type: str = Form(...),
+        row: str = Form(...),
+        faction: str = Form(...),
+        ability: str = Form(...),
+        image: Optional[UploadFile] = File(None),
+        db: Session = Depends(get_db)
+):
+    card = db.query(DBCard).filter(DBCard.id == card_id).first()
+    if not card:
+        raise HTTPException(status_code=404, detail="Carta no encontrada")
+
+    # Si el usuario sube una nueva imagen
+    if image and image.filename:
+        file_bytes = image.file.read()
+        file_ext = image.filename.split('.')[-1]
+        file_path = f"cards/{card_id}_image.{file_ext}"
+        try:
+            supabase.storage.from_(SUPABASE_BUCKET).upload(
+                file=file_bytes,
+                path=file_path,
+                file_options={"content-type": image.content_type, "upsert": "true"}
+            )
+            card.image_url = supabase.storage.from_(SUPABASE_BUCKET).get_public_url(file_path)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error al subir la nueva imagen: {str(e)}")
+
+    card.power = power
+    card.name = name
+    card.type = type
+    card.row = row
+    card.faction = faction
+    card.ability = ability
+
+    db.commit()
+    db.refresh(card)
+
+    return RedirectResponse(url=f"/cards_html/{card_id}", status_code=303)
+
+
+@app.post("/cards_html/{card_id}/delete", summary="Eliminar carta desde HTML")
+def delete_card_html(card_id: int, db: Session = Depends(get_db)):
+    deck_card_repo.delete(db, card_id=card_id)
+    card_repo.delete(db, id=card_id)
+
+    return RedirectResponse(url="/", status_code=303)

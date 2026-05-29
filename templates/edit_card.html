@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Carta - {{ card.name }}</title>
+</head>
+<body>
+    <h1>Editar carta: {{ card.name }}</h1>
+    <hr>
+    <!-- Fíjate que envía los datos a /cards_edit_form/id -->
+    <form action="/cards_edit_form/{{ card.id }}" method="POST" enctype="multipart/form-data">
+
+        <!-- El ID no se debe poder cambiar una vez creado, lo mostramos pero deshabilitado -->
+        <label for="id">ID de la carta:</label><br>
+        <input type="number" id="id" value="{{ card.id }}" disabled><br><br>
+
+        <label for="name">Nombre de la carta:</label><br>
+        <input type="text" id="name" name="name" value="{{ card.name }}" required><br><br>
+
+        <label for="power">Poder:</label><br>
+        <input type="number" id="power" name="power" value="{{ card.power }}" required><br><br>
+
+        <label for="type">Tipo:</label><br>
+        <select id="type" name="type" required>
+            <option value="Unit" {% if card.type == 'Unit' %}selected{% endif %}>Unit</option>
+            <option value="Hero" {% if card.type == 'Hero' %}selected{% endif %}>Hero</option>
+            <option value="Leader" {% if card.type == 'Leader' %}selected{% endif %}>Leader</option>
+            <option value="Weather" {% if card.type == 'Weather' %}selected{% endif %}>Weather</option>
+            <option value="Special" {% if card.type == 'Special' %}selected{% endif %}>Special</option>
+        </select><br><br>
+
+        <label for="row">Línea (Fila):</label><br>
+        <select id="row" name="row" required>
+            <option value="Melee" {% if card.row == 'Melee' %}selected{% endif %}>Melee</option>
+            <option value="Range" {% if card.row == 'Range' %}selected{% endif %}>Range</option>
+            <option value="Siege" {% if card.row == 'Siege' %}selected{% endif %}>Siege</option>
+            <option value="Agile(Melee+Range)" {% if card.row == 'Agile(Melee+Range)' %}selected{% endif %}>Agile (Melee+Range)</option>
+            <option value="None" {% if card.row == 'None' %}selected{% endif %}>Ninguna (Leader/Weather/Special)</option>
+        </select><br><br>
+
+        <label for="faction">Facción:</label><br>
+        <select id="faction" name="faction" required>
+            <option value="Northern Realms" {% if card.faction == 'Northern Realms' %}selected{% endif %}>Northern Realms</option>
+            <option value="Monsters" {% if card.faction == 'Monsters' %}selected{% endif %}>Monsters</option>
+            <option value="Nilfgaardian Empire" {% if card.faction == 'Nilfgaardian Empire' %}selected{% endif %}>Nilfgaardian Empire</option>
+            <option value="Scoia'tael" {% if card.faction == "Scoia'tael" %}selected{% endif %}>Scoia'tael</option>
+            <option value="Neutral" {% if card.faction == 'Neutral' %}selected{% endif %}>Neutral</option>
+            <option value="Skellige" {% if card.faction == 'Skellige' %}selected{% endif %}>Skellige</option>
+        </select><br><br>
+
+        <label for="ability">Habilidad:</label><br>
+        <select id="ability" name="ability" required>
+            <option value="Ninguna" {% if card.ability == 'Ninguna' %}selected{% endif %}>Ninguna</option>
+            <option value="Berserker" {% if card.ability == 'Berserker' %}selected{% endif %}>Berserker</option>
+            <option value="Commander Horn" {% if card.ability == 'Commander Horn' %}selected{% endif %}>Commander Horn</option>
+            <option value="Decoy" {% if card.ability == 'Decoy' %}selected{% endif %}>Decoy</option>
+            <option value="Hero" {% if card.ability == 'Hero' %}selected{% endif %}>Hero</option>
+            <option value="Medic" {% if card.ability == 'Medic' %}selected{% endif %}>Medic</option>
+            <option value="Morale Boost" {% if card.ability == 'Morale Boost' %}selected{% endif %}>Morale Boost</option>
+            <option value="Mardroeme" {% if card.ability == 'Mardroeme' %}selected{% endif %}>Mardroeme</option>
+            <option value="Muster" {% if card.ability == 'Muster' %}selected{% endif %}>Muster</option>
+            <option value="Scorch" {% if card.ability == 'Scorch' %}selected{% endif %}>Scorch</option>
+            <option value="Spy" {% if card.ability == 'Spy' %}selected{% endif %}>Spy</option>
+            <option value="Tight Bond" {% if card.ability == 'Tight Bond' %}selected{% endif %}>Tight Bond</option>
+        </select><br><br>
+
+        <label for="image">Cambiar archivo de imagen (Dejar vacío si no deseas cambiarla):</label><br>
+        <input type="file" id="image" name="image" accept="image/*"><br><br>
+
+        <button type="submit">Actualizar Carta</button>
+    </form>
+
+    <br>
+    <a href="/cards_html/{{ card.id }}">Cancelar</a>
+</body>
+</html>
