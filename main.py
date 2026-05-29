@@ -5,7 +5,7 @@ from repository import DBRepository
 from database import engine, Base, get_db
 from typing import List, Optional
 from database import supabase, SUPABASE_BUCKET
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 Base.metadata.create_all(bind=engine)
@@ -185,15 +185,14 @@ def validate_deck_endpoint(deck_id: int, db: Session = Depends(get_db)):
     resultado = validate_gwent_deck(deck, deck_cards, all_cards)
     return {"validacion": resultado}
 
+# HTML endpoints
 
 @app.get("/cards_html/{card_id}", response_class=HTMLResponse, summary="Ver una carta en HTML")
 def get_card_html(request: Request, card_id: int, db: Session = Depends(get_db)):
-    # Buscamos la carta en la base de datos usando el modelo de Neon DB
     card = db.query(DBCard).filter(DBCard.id == card_id).first()
     if not card:
         raise HTTPException(status_code=404, detail="Carta no encontrada")
 
-    # Renderizamos la plantilla enviando los datos de la carta
     return templates.TemplateResponse("card.html", {
         "request": request,
         "card": card
@@ -207,3 +206,55 @@ def all_cards_html(request: Request, db: Session = Depends(get_db)):
         "request": request,
         "cards": cards
     })
+
+
+@app.get("/create_card", response_class=HTMLResponse, summary="Formulario para crear carta")
+def show_create_card_form(request: Request):
+    return templates.TemplateResponse("create_card.html", {"request": request})
+
+
+@app.post("/cards_form", summary="Procesar formulario de carta y guardar en DB")
+def create_card_from_form(
+        id: int = Form(...),
+        power: int = Form(...),
+        name: str = Form(...),
+        type: str = Form(...),
+        row: str = Form(...),
+        faction: str = Form(...),
+        ability: str = Form(...),
+        image: Optional[UploadFile] = File(None),
+        db: Session = Depends(get_db)
+):
+    image_url = None
+
+    if image and image.filename:
+        if not supabase:
+            raise HTTPException(status_code=500, detail="Configuración de Supabase no encontrada")
+
+        file_bytes = image.file.read()
+        file_ext = image.filename.split('.')[-1]
+        file_path = f"cards/{id}_image.{file_ext}"
+
+        try:
+            supabase.storage.from_(SUPABASE_BUCKET).upload(
+                file=file_bytes,
+                path=file_path,
+                file_options={"content-type": image.content_type, "upsert": "true"}
+            )
+            image_url = supabase.storage.from_(SUPABASE_BUCKET).get_public_url(file_path)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error al subir la imagen: {str(e)}")
+
+    card_data = {
+        "id": id,
+        "power": power,
+        "name": name,
+        "type": type,
+        "row": row,
+        "faction": faction,
+        "ability": ability,
+        "image_url": image_url
+    }
+
+    card_repo.save(db, item_data=card_data)
+    return RedirectResponse(url="/", status_code=303)
