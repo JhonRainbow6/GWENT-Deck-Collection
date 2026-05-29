@@ -226,7 +226,7 @@ def all_cards_and_decks_html(
         query = query.filter(DBCard.row.ilike(row))
     cards = query.all()
     decks = db.query(DBDeck).all()
-    return templates.TemplateResponse("cards_list.html", {
+    return templates.TemplateResponse("Dashboard.html", {
         "request": request,
         "cards": cards,
         "decks": decks

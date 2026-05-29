@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gwent Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0b0c10;
+            color: #e0e0e0;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: radial-gradient(circle at 50% 0%, #1a332a 0%, #0b0c10 60%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Cinzel', serif;
+            color: #d4af37;
+            text-transform: uppercase;
+            text-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
+            margin-top: 0;
+        }
+
+        .header {
+            background: linear-gradient(180deg, #111 0%, #000 100%);
+            border-bottom: 2px solid #d4af37;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 255, 128, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            letter-spacing: 2px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            gap: 30px;
+        }
+        .column {
+            width: 48%;
+            background: rgba(15, 15, 15, 0.85);
+            border: 1px solid #333;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 0 15px rgba(0, 255, 128, 0.05);
+            position: relative;
+        }
+
+        .filters {
+            background: rgba(25, 25, 25, 0.9);
+            border: 1px solid #d4af37;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.1);
+        }
+
+        .filters form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-size: 0.85em;
+            color: #aaa;
+            margin-bottom: 3px;
+        }
+
+        input, select {
+            background-color: #111;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 8px;
+            border-radius: 3px;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        input:focus, select:focus {
+            border-color: #d4af37;
+            outline: none;
+        }
+
+        button {
+            background: linear-gradient(to bottom, #d4af37, #aa8010);
+            color: #000;
+            font-family: 'Cinzel', serif;
+            font-weight: bold;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 3px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        button:hover {
+            background: linear-gradient(to bottom, #fceb9c, #d4af37);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(to bottom, #555, #333);
+            color: #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(to bottom, #777, #555);
+            box-shadow: 0 0 10px #777;
+            color: #fff;
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #d4af37, transparent);
+            margin: 20px 0;
+        }
+
+        .list-grid {
+            display: grid;
+            gap: 10px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .grid-cards {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .grid-decks {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .list-grid li {
+            background: #111;
+            border: 1px solid #444;
+            padding: 10px;
+            border-radius: 5px;
+            transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .list-grid li::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #d4af37;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .list-grid li:hover::before {
+            transform: scaleX(1);
+        }
+
+        .list-grid li:hover {
+            border-color: #d4af37;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.15);
+        }
+
+        .list-grid strong {
+            color: #d4af37;
+            font-size: 1em;
+            font-family: 'Cinzel', serif;
+            display: block;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .badge-faction {
+            color: #aaa;
+            font-size: 0.75em;
+            margin-bottom: 5px;
+        }
+
+        .badge-power {
+            background: #d4af37;
+            color: #000;
+            font-weight: bold;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            display: inline-block;
+            margin-top: 3px;
+        }
+
+        .list-grid a {
+            color: #d4af37;
+            text-decoration: none;
+            text-align: center;
+            display: block;
+            margin-top: 10px;
+            padding: 6px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 3px;
+            transition: background 0.3s, color 0.3s;
+            font-family: 'Cinzel', serif;
+            font-weight: bold;
+            font-size: 0.8em;
+        }
+
+        .list-grid a:hover {
+            background: #d4af37;
+            color: #000;
+        }
+
+        .glow-decoration {
+            position: fixed;
+            top: 30%;
+            left: -10%;
+            width: 40vw;
+            height: 60vh;
+            background: radial-gradient(ellipse at center, rgba(0, 255, 128, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .glow-decoration.right {
+            left: auto;
+            right: -10%;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            margin-left: auto;
+        }
+
+        .card-image-thumbnail {
+            width: 100%;
+            height: 250px;
+            border-radius: 3px;
+            margin-bottom: 8px;
+            border: 1px solid #444;
+            transition: opacity 0.3s;
+        }
+
+        .card-image-placeholder {
+            width: 100%;
+            height: 120px;
+            background: #1a1a1a;
+            color: #555;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 3px;
+            margin-bottom: 8px;
+            border: 1px dashed #333;
+            font-size: 0.8em;
+            text-transform: uppercase;
+        }
+
+        .card-info {
+            flex-grow: 1;
+        }
+    </style>
+
+
+</head>
+<body>
+    <div class="glow-decoration"></div>
+    <div class="glow-decoration right"></div>
+
+    <div class="header">
+        <h1>GWENT<br><span style="font-size: 0.4em; color: #fff; letter-spacing: 5px;">Colección</span></h1>
+    </div>
+
+    <div class="container">
+        <div class="column">
+            <h2>Colección de Cartas ({{ cards|length }})</h2>
+            <a href="/create_card"><button>Registrar Nueva Carta</button></a>
+            <br><br>
+
+            <div class="filters">
+                <h4>Filtros</h4>
+                <form action="/" method="GET">
+                    <div class="filter-group">
+                        <label for="id">ID:</label>
+                        <input type="number" name="id" id="id" style="width: 70px;">
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="power">Poder:</label>
+                        <input type="number" name="power" id="power" style="width: 70px;">
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="faction">Facción:</label>
+                        <select name="faction" id="faction">
+                            <option value="All">Todas</option>
+                            <option value="Northern Realms">Northern Realms</option>
+                            <option value="Monsters">Monsters</option>
+                            <option value="Nilfgaardian Empire">Nilfgaardian Empire</option>
+                            <option value="Scoia'tael">Scoia'tael</option>
+                            <option value="Skellige">Skellige</option>
+                            <option value="Neutral">Neutral</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="type">Tipo:</label>
+                        <select name="type" id="type">
+                            <option value="All">Todos</option>
+                            <option value="Hero">Hero</option>
+                            <option value="Unit">Unit</option>
+                            <option value="Leader">Leader</option>
+                            <option value="Special">Special</option>
+                            <option value="Weather">Weather</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="row">Fila:</label>
+                        <select name="row" id="row">
+                            <option value="All">Todas</option>
+                            <option value="Melee">Melee</option>
+                            <option value="Range">Range</option>
+                            <option value="Siege">Siege</option>
+                            <option value="Agile(Melee+Range)">Agile (Melee+Range)</option>
+                            <option value="None">Ninguna</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-buttons">
+                        <button type="submit">Aplicar</button>
+                        <a href="/" style="text-decoration:none;">
+                            <button type="button" class="btn-secondary">Limpiar</button>
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <hr>
+
+            <ul class="list-grid grid-cards">
+                {% for c in cards %}
+                    <li>
+                        {% if c.image_url %}
+                            <img src="{{ c.image_url }}" alt="{{ c.name }}" class="card-image-thumbnail">
+                        {% else %}
+                            <div class="card-image-placeholder">Sin Imagen</div>
+                        {% endif %}
+                        <div class="card-info">
+                            <strong>{{ c.name }}</strong>
+                            <div class="badge-faction">{{ c.faction }} • {{ c.type }}</div>
+                            <div class="badge-power">Poder: {{ c.power }}</div>
+                        </div>
+                        <a href="/cards_html/{{ c.id }}">Ver detalles</a>
+                    </li>
+                {% else %}
+                    <p style="color: #aaa; text-align: center; width: 100%; grid-column: 1 / -1;">No se encontraron cartas con esos filtros.</p>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="column">
+            <h2>Tus Barajas (Decks)</h2>
+            <a href="/create_deck"><button>Crear Nueva Baraja</button></a>
+            <hr>
+            <ul class="list-grid grid-decks">
+                {% for d in decks %}
+                    <li>
+                        <div>
+                            <strong>{{ d.name }}</strong>
+                            <div class="badge-faction">{{ d.faction }}</div>
+                        </div>
+                        <a href="/decks_html/{{ d.id }}">Detalles del mazo</a>
+                    </li>
+                {% else %}
+                    <p style="color: #aaa; text-align: center; width: 100%; grid-column: 1 / -1;">No has creado ninguna baraja aún.</p>
+                {% endfor %}
+            </ul>
+        </div>
+
+    </div>
+</body>
+</html>
