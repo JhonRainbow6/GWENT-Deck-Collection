@@ -203,9 +203,11 @@ def get_card_html(request: Request, card_id: int, db: Session = Depends(get_db))
 @app.get("/", response_class=HTMLResponse, summary="Ver lista de cartas en HTML")
 def all_cards_html(request: Request, db: Session = Depends(get_db)):
     cards = db.query(DBCard).all()
+    decks = db.query(DBDeck).all()
     return templates.TemplateResponse("cards_list.html", {
         "request": request,
-        "cards": cards
+        "cards": cards,
+        "decks": decks
     })
 
 
@@ -361,3 +363,33 @@ def create_deck_from_form(
 
     deck_repo.save(db, item_data=deck_data)
     return RedirectResponse(url="/", status_code=303)
+
+
+@app.get("/decks_html/{deck_id}", response_class=HTMLResponse, summary="Ver detalle de una baraja y sus cartas")
+def get_deck_html(request: Request, deck_id: int, db: Session = Depends(get_db)):
+    deck = db.query(DBDeck).filter(DBDeck.id == deck_id).first()
+    if not deck:
+        raise HTTPException(status_code=404, detail="Mazo no encontrado")
+
+    leader_card = db.query(DBCard).filter(DBCard.id == deck.leader_id).first()
+
+    deck_cards_entries = db.query(DBDeckCard).filter(DBDeckCard.deck_id == deck_id).all()
+
+    detailed_cards = []
+    total_cards_count = 0
+    for entry in deck_cards_entries:
+        card = db.query(DBCard).filter(DBCard.id == entry.card_id).first()
+        if card:
+            detailed_cards.append({
+                "card": card,
+                "quantity": entry.quantity
+            })
+            total_cards_count += entry.quantity
+
+    return templates.TemplateResponse("deck_detail.html", {
+        "request": request,
+        "deck": deck,
+        "leader": leader_card,
+        "deck_cards": detailed_cards,
+        "total_cards": total_cards_count
+    })

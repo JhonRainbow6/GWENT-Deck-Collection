@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gwent Mazo - {{ deck.name }}</title>
+</head>
+<body>
+    <h1>Mazo: {{ deck.name }}</h1>
+    <h2>Facción: {{ deck.faction }}</h2>
+    <h4>ID: {{ deck.id }}</h4>
+    <hr>
+
+    <h3>Carta Líder</h3>
+    {% if leader %}
+        <p><strong>{{ leader.name }}</strong> (Habilidad: {{ leader.ability }})</p>
+        {% if leader.image_url %}
+            <img src="{{ leader.image_url }}" alt="Imagen de {{ leader.name }}" style="max-width: 150px;">
+        {% endif %}
+    {% else %}
+        <p style="color: red;">Error: Líder no encontrado.</p>
+    {% endif %}
+
+    <hr>
+    <h3>Cartas en la Baraja (Total de unidades y especiales: {{ total_cards }})</h3>
+
+    <ul>
+        {% for item in deck_cards %}
+            <li>
+                {{ item.quantity }}x <strong>{{ item.card.name }}</strong>
+                (Tipo: {{ item.card.type }}, Fila: {{ item.card.row }}, Poder: {{ item.card.power }})
+            </li>
+        {% else %}
+            <p>Aún no has añadido cartas a esta baraja.</p>
+        {% endfor %}
+    </ul>
+
+    <br><br>
+
+    <!-- botones editar y eliminar-->
+
+    <a href="/">Volver al Dashboard principal</a>
+</body>
+</html>
