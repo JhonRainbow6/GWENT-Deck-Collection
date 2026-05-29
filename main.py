@@ -16,30 +16,29 @@ card_repo = DBRepository(DBCard)
 deck_repo = DBRepository(DBDeck)
 deck_card_repo = DBRepository(DBDeckCard)
 
-#reglas de validacion mazo
+# reglas de validacion mazo
 def validate_gwent_deck(deck: Deck, deck_cards: list[DeckCard], all_cards: list[Card]) -> str:
     leader = next((c for c in all_cards if c.id == deck.leader_id), None)
     if not leader or leader.type.lower() != "leader":
         return "Error: El leader_id debe pertenecer a una carta de tipo 'Leader'"
 
-    units_count = 0
+    total_count = 0
     specials_count = 0
 
     for dc in deck_cards:
         card = next((c for c in all_cards if c.id == dc.card_id), None)
         if not card:
             return f"Error: La carta ID {dc.card_id} no existe."
-
-        if card.type == 'Unit':
-            units_count += dc.quantity
-        elif card.type == 'Special':
+        total_count += dc.quantity
+        if card.type.lower() == 'special':
             specials_count += dc.quantity
 
         if hasattr(card, 'faction') and card.faction != deck.faction and card.faction != "Neutral":
             return f"Error: La carta {card.name} no pertenece a la facción."
 
-    if units_count < 20:
-        return f"Error: Necesitas al menos 20 cartas de unidad. Tienes {units_count}."
+    if total_count < 20:
+        return f"Error: Necesitas al menos 20 cartas en total. Tienes {total_count}."
+
     if specials_count > 5:
         return f"Error: No puedes tener más de 5 cartas especiales. Tienes {specials_count}."
 

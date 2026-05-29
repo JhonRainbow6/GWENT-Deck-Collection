@@ -25,8 +25,8 @@
     <!-- validaciones visuales  -->
     <h3>Estado de Validaciones:</h3>
     <ul>
-        <li style="color: {% if units_count >= 15 %}green{% else %}red{% endif %};">
-            Cartas de Unidad: {{ units_count }} / Min: 15
+        <li style="color: {% if total_cards >= 20 %}green{% else %}red{% endif %};">
+            Cartas Totales: {{ total_cards }} / Min: 20
         </li>
         <li style="color: {% if specials_count <= 5 %}green{% else %}red{% endif %};">
             Cartas Especiales: {{ specials_count }} / Máx: 5
