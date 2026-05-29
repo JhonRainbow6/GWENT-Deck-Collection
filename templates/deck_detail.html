@@ -77,6 +77,12 @@
         <button type="submit">Agregar al Mazo</button>
     </form>
 
+    <hr>
+    <h3>Opciones del Mazo</h3>
+    <form action="/decks_html/{{ deck.id }}/delete" method="POST" style="display:inline;" onsubmit="return confirm('¿Eliminar Mazo?');">
+        <button type="submit" style="color: red; padding: 5px 10px; font-weight: bold;">Eliminar Mazo</button>
+    </form>
+
     <br><br>
 
     <a href="/">Volver al Dashboard principal</a>

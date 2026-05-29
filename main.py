@@ -392,7 +392,7 @@ def get_deck_html(request: Request, deck_id: int, db: Session = Depends(get_db))
             elif card.type.lower() == 'unit':
                 units_count += entry.quantity
 
-    # 1. Buscamos cartas permitidas para agregar a este mazo (Misma facción + Neutrales, y que no sean Líderes)
+    # misma faccion + neutrales, no leaders
     available_cards = db.query(DBCard).filter(
         DBCard.type.not_ilike("leader"),
         DBCard.faction.in_([deck.faction, "Neutral"])
@@ -423,13 +423,11 @@ def add_card_to_deck_html(
     if not deck or not card:
         raise HTTPException(status_code=404, detail="Mazo o carta no encontrados.")
 
-    # Validar facción de seguridad
+    # validar faccion
     if card.faction != deck.faction and card.faction != "Neutral":
         raise HTTPException(status_code=400, detail="La carta no pertenece a la facción.")
 
-    # Validar el límite de cartas Especiales (Máximo 5)
     if card.type.lower() == 'special':
-        # Sumamos cuántas especiales ya tiene
         current_specials = sum(
             entry.quantity for entry in db.query(DBDeckCard).filter(DBDeckCard.deck_id == deck_id).all()
             if db.query(DBCard).filter(DBCard.id == entry.card_id).first().type.lower() == 'special'
@@ -438,7 +436,7 @@ def add_card_to_deck_html(
             raise HTTPException(status_code=400,
                                 detail=f"Excedes el límite. Tienes {current_specials} cartas especiales permitidas (Máx 5).")
 
-    # Si ya existe la carta en el mazo, se le suma a la cantidad actual
+    # si ya existe la carta en el mazo, se sumara a la cantidad actual
     entry = db.query(DBDeckCard).filter(DBDeckCard.deck_id == deck_id, DBDeckCard.card_id == card_id).first()
     if entry:
         entry.quantity += quantity
@@ -457,3 +455,11 @@ def remove_card_from_deck_html(deck_id: int, card_id: int, db: Session = Depends
         db.delete(entry)
         db.commit()
     return RedirectResponse(url=f"/decks_html/{deck_id}", status_code=303)
+
+
+@app.post("/decks_html/{deck_id}/delete", summary="Eliminar un mazo por completo desde HTML")
+def delete_deck_html(deck_id: int, db: Session = Depends(get_db)):
+    deck_card_repo.delete(db, deck_id=deck_id)
+
+    deck_repo.delete(db, id=deck_id)
+    return RedirectResponse(url="/", status_code=303)
