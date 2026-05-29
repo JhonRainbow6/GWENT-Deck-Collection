@@ -38,10 +38,10 @@ def validate_gwent_deck(deck: Deck, deck_cards: list[DeckCard], all_cards: list[
         if hasattr(card, 'faction') and card.faction != deck.faction and card.faction != "Neutral":
             return f"Error: La carta {card.name} no pertenece a la facción."
 
-    if units_count < 22:
-        return f"Error: Necesitas al menos 22 cartas de unidad. Tienes {units_count}."
-    if specials_count > 10:
-        return f"Error: No puedes tener más de 10 cartas especiales. Tienes {specials_count}."
+    if units_count < 20:
+        return f"Error: Necesitas al menos 20 cartas de unidad. Tienes {units_count}."
+    if specials_count > 5:
+        return f"Error: No puedes tener más de 5 cartas especiales. Tienes {specials_count}."
 
     return "Mazo válido"
 
@@ -372,11 +372,13 @@ def get_deck_html(request: Request, deck_id: int, db: Session = Depends(get_db))
         raise HTTPException(status_code=404, detail="Mazo no encontrado")
 
     leader_card = db.query(DBCard).filter(DBCard.id == deck.leader_id).first()
-
     deck_cards_entries = db.query(DBDeckCard).filter(DBDeckCard.deck_id == deck_id).all()
 
     detailed_cards = []
     total_cards_count = 0
+    specials_count = 0
+    units_count = 0
+
     for entry in deck_cards_entries:
         card = db.query(DBCard).filter(DBCard.id == entry.card_id).first()
         if card:
@@ -385,11 +387,73 @@ def get_deck_html(request: Request, deck_id: int, db: Session = Depends(get_db))
                 "quantity": entry.quantity
             })
             total_cards_count += entry.quantity
+            if card.type.lower() == 'special':
+                specials_count += entry.quantity
+            elif card.type.lower() == 'unit':
+                units_count += entry.quantity
+
+    # 1. Buscamos cartas permitidas para agregar a este mazo (Misma facción + Neutrales, y que no sean Líderes)
+    available_cards = db.query(DBCard).filter(
+        DBCard.type.not_ilike("leader"),
+        DBCard.faction.in_([deck.faction, "Neutral"])
+    ).all()
 
     return templates.TemplateResponse("deck_detail.html", {
         "request": request,
         "deck": deck,
         "leader": leader_card,
         "deck_cards": detailed_cards,
-        "total_cards": total_cards_count
+        "total_cards": total_cards_count,
+        "units_count": units_count,
+        "specials_count": specials_count,
+        "available_cards": available_cards
     })
+
+
+@app.post("/decks_html/{deck_id}/add_card", summary="Añadir carta a una baraja desde HTML")
+def add_card_to_deck_html(
+        deck_id: int,
+        card_id: int = Form(...),
+        quantity: int = Form(...),
+        db: Session = Depends(get_db)
+):
+    deck = db.query(DBDeck).filter(DBDeck.id == deck_id).first()
+    card = db.query(DBCard).filter(DBCard.id == card_id).first()
+
+    if not deck or not card:
+        raise HTTPException(status_code=404, detail="Mazo o carta no encontrados.")
+
+    # Validar facción de seguridad
+    if card.faction != deck.faction and card.faction != "Neutral":
+        raise HTTPException(status_code=400, detail="La carta no pertenece a la facción.")
+
+    # Validar el límite de cartas Especiales (Máximo 5)
+    if card.type.lower() == 'special':
+        # Sumamos cuántas especiales ya tiene
+        current_specials = sum(
+            entry.quantity for entry in db.query(DBDeckCard).filter(DBDeckCard.deck_id == deck_id).all()
+            if db.query(DBCard).filter(DBCard.id == entry.card_id).first().type.lower() == 'special'
+        )
+        if current_specials + quantity > 5:
+            raise HTTPException(status_code=400,
+                                detail=f"Excedes el límite. Tienes {current_specials} cartas especiales permitidas (Máx 5).")
+
+    # Si ya existe la carta en el mazo, se le suma a la cantidad actual
+    entry = db.query(DBDeckCard).filter(DBDeckCard.deck_id == deck_id, DBDeckCard.card_id == card_id).first()
+    if entry:
+        entry.quantity += quantity
+    else:
+        new_entry = DBDeckCard(deck_id=deck_id, card_id=card_id, quantity=quantity)
+        db.add(new_entry)
+
+    db.commit()
+    return RedirectResponse(url=f"/decks_html/{deck_id}", status_code=303)
+
+
+@app.post("/decks_html/{deck_id}/remove_card/{card_id}", summary="Quitar carta de la baraja")
+def remove_card_from_deck_html(deck_id: int, card_id: int, db: Session = Depends(get_db)):
+    entry = db.query(DBDeckCard).filter(DBDeckCard.deck_id == deck_id, DBDeckCard.card_id == card_id).first()
+    if entry:
+        db.delete(entry)
+        db.commit()
+    return RedirectResponse(url=f"/decks_html/{deck_id}", status_code=303)

@@ -21,22 +21,63 @@
     {% endif %}
 
     <hr>
-    <h3>Cartas en la Baraja (Total de unidades y especiales: {{ total_cards }})</h3>
 
+    <!-- validaciones visuales  -->
+    <h3>Estado de Validaciones:</h3>
+    <ul>
+        <li style="color: {% if units_count >= 15 %}green{% else %}red{% endif %};">
+            Cartas de Unidad: {{ units_count }} / Min: 15
+        </li>
+        <li style="color: {% if specials_count <= 5 %}green{% else %}red{% endif %};">
+            Cartas Especiales: {{ specials_count }} / Máx: 5
+        </li>
+    </ul>
+
+    <hr>
+    <h3>Cartas en la Baraja (Total Cartas: {{ total_cards }})</h3>
     <ul>
         {% for item in deck_cards %}
             <li>
                 {{ item.quantity }}x <strong>{{ item.card.name }}</strong>
                 (Tipo: {{ item.card.type }}, Fila: {{ item.card.row }}, Poder: {{ item.card.power }})
+
+                <!-- eliminar carta del mazo -->
+                <form action="/decks_html/{{ deck.id }}/remove_card/{{ item.card.id }}" method="POST" style="display:inline;">
+                    <button type="submit" style="color: red; border: none; background: none; cursor: pointer; text-decoration: underline;">
+                        [Quitar]
+                    </button>
+                </form>
             </li>
         {% else %}
             <p>Aún no has añadido cartas a esta baraja.</p>
         {% endfor %}
     </ul>
 
-    <br><br>
+    <hr>
 
-    <!-- botones editar y eliminar-->
+    <!-- agregar carta al mazo -->
+    <h3>Añadir carta a este Mazo</h3>
+    <form action="/decks_html/{{ deck.id }}/add_card" method="POST">
+        <label for="card_id">Selecciona la Carta:</label>
+        <select id="card_id" name="card_id" required>
+            <option value="" disabled selected>-- Elige una carta --</option>
+            {% for c in available_cards %}
+                <option value="{{ c.id }}">{{ c.name }} (Poder: {{ c.power }}, Tipo: {{ c.type }})</option>
+            {% else %}
+                <option value="" disabled>No tienes cartas registradas de esta facción o Neutrales.</option>
+            {% endfor %}
+        </select>
+
+        <br><br>
+
+        <label for="quantity">Cantidad a agregar:</label>
+        <input type="number" id="quantity" name="quantity" min="1" max="5" value="1" required>
+
+        <br><br>
+        <button type="submit">Agregar al Mazo</button>
+    </form>
+
+    <br><br>
 
     <a href="/">Volver al Dashboard principal</a>
 </body>
