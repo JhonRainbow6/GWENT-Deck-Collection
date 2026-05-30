@@ -18,6 +18,15 @@
             min-height: 100vh;
         }
 
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield; /* Firefox */
+        }
+
         h1, h2, h3, h4 {
             font-family: 'Cinzel', serif;
             color: #d4af37;
