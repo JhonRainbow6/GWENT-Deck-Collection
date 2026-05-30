@@ -3,88 +3,404 @@
 <head>
     <meta charset="UTF-8">
     <title>Gwent Mazo - {{ deck.name }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0b0c10;
+            color: #e0e0e0;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: radial-gradient(circle at 50% 0%, #1a332a 0%, #0b0c10 60%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Cinzel', serif;
+            color: #d4af37;
+            text-transform: uppercase;
+            text-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
+            margin-top: 0;
+        }
+
+        .header {
+            background: linear-gradient(180deg, #111 0%, #000 100%);
+            border-bottom: 2px solid #d4af37;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 255, 128, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            letter-spacing: 2px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            gap: 30px;
+        }
+
+        .sidebar { width: 32%; }
+        .main-content { width: 65%; }
+
+        .column-box {
+            background: rgba(15, 15, 15, 0.85);
+            border: 1px solid #333;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 0 15px rgba(0, 255, 128, 0.05);
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .filters {
+            background: rgba(25, 25, 25, 0.9);
+            border: 1px solid #d4af37;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.1);
+        }
+
+        label {
+            font-size: 0.85em;
+            color: #aaa;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        input, select {
+            background-color: #111;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 10px;
+            border-radius: 3px;
+            font-family: 'Roboto', sans-serif;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+
+        input:focus, select:focus {
+            border-color: #d4af37;
+            outline: none;
+        }
+
+        button {
+            background: linear-gradient(to bottom, #d4af37, #aa8010);
+            color: #000;
+            font-family: 'Cinzel', serif;
+            font-weight: bold;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            border-radius: 3px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            width: 100%;
+            display: block;
+        }
+
+        button:hover {
+            background: linear-gradient(to bottom, #fceb9c, #d4af37);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(to bottom, #555, #333);
+            color: #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(to bottom, #777, #555);
+            box-shadow: 0 0 10px #777;
+            color: #fff;
+        }
+
+        .btn-danger {
+            background: linear-gradient(to bottom, #a00, #600);
+            color: #fff;
+            margin-top: 10px;
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(to bottom, #f33, #a00);
+            box-shadow: 0 0 10px #f33;
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #d4af37, transparent);
+            margin: 20px 0;
+        }
+
+        .list-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .list-grid li {
+            background: #111;
+            border: 1px solid #444;
+            padding: 10px;
+            border-radius: 5px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .list-grid li:hover {
+            border-color: #d4af37;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.15);
+        }
+
+        .card-image-thumbnail {
+            width: 100%;
+            height: 300px;
+            border-radius: 3px;
+            margin-bottom: 8px;
+            border: 1px solid #444;
+        }
+
+        .leader-box {
+            text-align: center;
+        }
+
+        .leader-box .card-image-thumbnail {
+            height: 450px;
+            border-color: #d4af37;
+        }
+
+        .card-image-placeholder {
+            width: 100%;
+            height: 200px;
+            background: #1a1a1a;
+            color: #555;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 3px;
+            margin-bottom: 8px;
+            border: 1px dashed #333;
+            font-size: 0.8em;
+            text-transform: uppercase;
+        }
+
+        .qty-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #d4af37;
+            color: #000;
+            font-family: 'Cinzel', serif;
+            font-weight: bold;
+            font-size: 1.1em;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.8);
+            border: 2px solid #111;
+            z-index: 10;
+        }
+
+        .list-grid strong {
+            color: #d4af37;
+            font-size: 1em;
+            font-family: 'Cinzel', serif;
+            display: block;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .badge-faction {
+            color: #aaa;
+            font-size: 0.75em;
+            margin-bottom: 5px;
+        }
+
+        .badge-power {
+            background: #d4af37;
+            color: #000;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            display: inline-block;
+            margin-top: 3px;
+        }
+
+        .status-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .status-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #333;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .status-list li:last-child {
+            border-bottom: none;
+        }
+
+        .valid { color: #00ff80; }
+        .invalid { color: #ff4d4d; }
+
+        .glow-decoration {
+            position: fixed;
+            top: 30%;
+            left: -10%;
+            width: 40vw;
+            height: 60vh;
+            background: radial-gradient(ellipse at center, rgba(0, 255, 128, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .glow-decoration.right {
+            left: auto;
+            right: -10%;
+        }
+    </style>
 </head>
 <body>
-    <h1>Mazo: {{ deck.name }}</h1>
-    <h2>Facción: {{ deck.faction }}</h2>
-    <h4>ID: {{ deck.id }}</h4>
-    <hr>
+    <div class="glow-decoration"></div>
+    <div class="glow-decoration right"></div>
 
-    <h3>Carta Líder</h3>
-    {% if leader %}
-        <p><strong>{{ leader.name }}</strong> (Habilidad: {{ leader.ability }})</p>
-        {% if leader.image_url %}
-            <img src="{{ leader.image_url }}" alt="Imagen de {{ leader.name }}" style="max-width: 150px;">
-        {% endif %}
-    {% else %}
-        <p style="color: red;">Error: Líder no encontrado.</p>
-    {% endif %}
+    <div class="header">
+        <h1>GESTOR DE MAZO<br><span style="font-size: 0.4em; color: #fff; letter-spacing: 5px;">{{ deck.name }}</span></h1>
+    </div>
 
-    <hr>
+    <div class="container">
 
-    <!-- validaciones visuales  -->
-    <h3>Estado de Validaciones:</h3>
-    <ul>
-        <li style="color: {% if total_cards >= 20 %}green{% else %}red{% endif %};">
-            Cartas Totales: {{ total_cards }} / Min: 20
-        </li>
-        <li style="color: {% if specials_count <= 5 %}green{% else %}red{% endif %};">
-            Cartas Especiales: {{ specials_count }} / Máx: 5
-        </li>
-    </ul>
+        <!-- SIDEBAR IZQUIERDA -->
+        <div class="sidebar">
+            <div class="column-box">
+                <h2>Facción: {{ deck.faction }}</h2>
+                <hr>
 
-    <hr>
-    <h3>Cartas en la Baraja (Total Cartas: {{ total_cards }})</h3>
-    <ul>
-        {% for item in deck_cards %}
-            <li>
-                {{ item.quantity }}x <strong>{{ item.card.name }}</strong>
-                (Tipo: {{ item.card.type }}, Fila: {{ item.card.row }}, Poder: {{ item.card.power }})
+                <div class="filters">
+                    <h4>Estado del Mazo</h4>
+                    <ul class="status-list">
+                        <li class="{% if total_cards >= 20 %}valid{% else %}invalid{% endif %}">
+                            <span>Sumatoria Cartas:</span>
+                            <span>{{ total_cards }} / Min 20</span>
+                        </li>
+                        <li class="{% if specials_count <= 5 %}valid{% else %}invalid{% endif %}">
+                            <span>Cartas Especiales:</span>
+                            <span>{{ specials_count }} / Máx 5</span>
+                        </li>
+                    </ul>
+                </div>
 
-                <!-- eliminar carta del mazo -->
-                <form action="/decks_html/{{ deck.id }}/remove_card/{{ item.card.id }}" method="POST" style="display:inline;">
-                    <button type="submit" style="color: red; border: none; background: none; cursor: pointer; text-decoration: underline;">
-                        [Quitar]
-                    </button>
+                <h3>Líder del Mazo</h3>
+                <div class="leader-box">
+                    {% if leader %}
+                        {% if leader.image_url %}
+                            <img src="{{ leader.image_url }}" alt="{{ leader.name }}" class="card-image-thumbnail">
+                        {% endif %}
+                        <strong>{{ leader.name }}</strong>
+                        <p style="font-size: 0.85em; color: #aaa; margin: 5px 0;">Habilidad: {{ leader.ability }}</p>
+                    {% else %}
+                        <p style="color: red;">Error: Líder no encontrado.</p>
+                    {% endif %}
+                </div>
+
+                <hr>
+
+                <div class="filters">
+                    <h4>Añadir Carta</h4>
+                    <form action="/decks_html/{{ deck.id }}/add_card" method="POST">
+                        <label for="card_id">Selecciona la Carta:</label>
+                        <select id="card_id" name="card_id" required>
+                            <option value="" disabled selected>-- Elige una carta --</option>
+                            {% for c in available_cards %}
+                                <option value="{{ c.id }}">{{ c.name }} (P:{{ c.power }}, T:{{ c.type }})</option>
+                            {% else %}
+                                <option value="" disabled>No hay cartas compatibles disponibles.</option>
+                            {% endfor %}
+                        </select>
+
+                        <label for="quantity">Cantidad a agregar:</label>
+                        <input type="number" id="quantity" name="quantity" min="1" max="5" value="1" required>
+
+                        <button type="submit">Agregar al Mazo</button>
+                    </form>
+                </div>
+
+                <hr>
+                <form action="/decks_html/{{ deck.id }}/delete" method="POST" style="margin-bottom: 10px;" onsubmit="return confirm('¿Eliminar Mazo Definitivamente?');">
+                    <button type="submit" class="btn-danger">Eliminar Mazo</button>
                 </form>
-            </li>
-        {% else %}
-            <p>Aún no has añadido cartas a esta baraja.</p>
-        {% endfor %}
-    </ul>
 
-    <hr>
+                <a href="/" style="text-decoration: none;">
+                    <button type="button" class="btn-secondary">Volver al Dashboard</button>
+                </a>
+            </div>
+        </div>
 
-    <!-- agregar carta al mazo -->
-    <h3>Añadir carta a este Mazo</h3>
-    <form action="/decks_html/{{ deck.id }}/add_card" method="POST">
-        <label for="card_id">Selecciona la Carta:</label>
-        <select id="card_id" name="card_id" required>
-            <option value="" disabled selected>-- Elige una carta --</option>
-            {% for c in available_cards %}
-                <option value="{{ c.id }}">{{ c.name }} (Poder: {{ c.power }}, Tipo: {{ c.type }})</option>
-            {% else %}
-                <option value="" disabled>No tienes cartas registradas de esta facción o Neutrales.</option>
-            {% endfor %}
-        </select>
+        <!-- CONTENIDO PRINCIPAL: CARTAS -->
+        <div class="main-content">
+            <div class="column-box">
+                <h2>Cartas en Baraja ({{ total_cards }})</h2>
+                <hr>
 
-        <br><br>
+                <ul class="list-grid">
+                    {% for item in deck_cards %}
+                        <li>
+                            <div class="qty-badge">{{ item.quantity }}</div>
+                            <div>
+                                {% if item.card.image_url %}
+                                    <img src="{{ item.card.image_url }}" alt="{{ item.card.name }}" class="card-image-thumbnail">
+                                {% else %}
+                                    <div class="card-image-placeholder">Sin Imagen</div>
+                                {% endif %}
 
-        <label for="quantity">Cantidad a agregar:</label>
-        <input type="number" id="quantity" name="quantity" min="1" max="5" value="1" required>
+                                <strong>{{ item.card.name }}</strong>
+                                <div class="badge-faction">{{ item.card.type }} • Fila: {{ item.card.row }}</div>
+                                <div class="badge-power">Poder: {{ item.card.power }}</div>
+                            </div>
 
-        <br><br>
-        <button type="submit">Agregar al Mazo</button>
-    </form>
+                            <form action="/decks_html/{{ deck.id }}/remove_card/{{ item.card.id }}" method="POST" style="margin-top: 10px;">
+                                <button type="submit" class="btn-danger" style="padding: 6px; font-size: 0.8em; margin-top:0;">Quitar</button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <p style="color: #aaa; text-align: center; width: 100%; grid-column: 1 / -1;">Aún no has añadido cartas a esta baraja.</p>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
 
-    <hr>
-    <h3>Opciones del Mazo</h3>
-    <form action="/decks_html/{{ deck.id }}/delete" method="POST" style="display:inline;" onsubmit="return confirm('¿Eliminar Mazo?');">
-        <button type="submit" style="color: red; padding: 5px 10px; font-weight: bold;">Eliminar Mazo</button>
-    </form>
-
-    <br><br>
-
-    <a href="/">Volver al Dashboard principal</a>
+    </div>
 </body>
 </html>
