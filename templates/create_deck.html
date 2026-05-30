@@ -3,42 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <title>Crear Nuevo Mazo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0b0c10;
+            color: #e0e0e0;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: radial-gradient(circle at 50% 0%, #1a332a 0%, #0b0c10 60%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Cinzel', serif;
+            color: #d4af37;
+            text-transform: uppercase;
+            text-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
+        }
+
+        .header {
+            width: 100%;
+            background: linear-gradient(180deg, #111 0%, #000 100%);
+            border-bottom: 2px solid #d4af37;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 255, 128, 0.1);
+            position: relative;
+            z-index: 10;
+            box-sizing: border-box;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            letter-spacing: 2px;
+        }
+
+        .form-container {
+            background: rgba(15, 15, 15, 0.85);
+            border: 1px solid #333;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 0 15px rgba(0, 255, 128, 0.05);
+            margin: 40px auto;
+            width: 100%;
+            max-width: 600px;
+            position: relative;
+            z-index: 1;
+            box-sizing: border-box;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 0.9em;
+            color: #aaa;
+            margin-bottom: 8px;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 1px;
+        }
+
+        input, select {
+            background-color: #111;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 12px;
+            border-radius: 3px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            border-color: #d4af37;
+            outline: none;
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+        }
+
+        .actions {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+        }
+
+        button {
+            background: linear-gradient(to bottom, #d4af37, #aa8010);
+            color: #000;
+            font-family: 'Cinzel', serif;
+            font-weight: bold;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            border-radius: 3px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            flex: 1;
+            font-size: 1.1em;
+        }
+
+        button:hover {
+            background: linear-gradient(to bottom, #fceb9c, #d4af37);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(to bottom, #555, #333);
+            color: #e0e0e0;
+            text-align: center;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 3px;
+            flex: 1;
+            font-family: 'Cinzel', serif;
+            font-weight: bold;
+            text-transform: uppercase;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(to bottom, #777, #555);
+            box-shadow: 0 0 10px #777;
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .glow-decoration {
+            position: fixed;
+            top: 30%;
+            left: -10%;
+            width: 40vw;
+            height: 60vh;
+            background: radial-gradient(ellipse at center, rgba(0, 255, 128, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .glow-decoration.right {
+            left: auto;
+            right: -10%;
+        }
+    </style>
 </head>
 <body>
-    <h1>Crear un nuevo Mazo de Gwent</h1>
-    <hr>
-    <form action="/decks_form" method="POST">
+    <div class="glow-decoration"></div>
+    <div class="glow-decoration right"></div>
 
-        <label for="id">ID del Mazo:</label><br>
-        <input type="number" id="id" name="id" required><br><br>
+    <div class="header">
+        <h1>MAZO<br><span style="font-size: 0.4em; color: #fff; letter-spacing: 5px;">Crear Nuevo Mazo</span></h1>
+    </div>
 
-        <label for="name">Nombre del Mazo:</label><br>
-        <input type="text" id="name" name="name" required><br><br>
+    <div class="form-container">
+        <form action="/decks_form" method="POST">
 
-        <!-- Menú desplegable para la Facción -->
-        <label for="faction">Facción:</label><br>
-        <select id="faction" name="faction" required>
-            <option value="Northern Realms">Northern Realms</option>
-            <option value="Monsters">Monsters</option>
-            <option value="Nilfgaardian Empire">Nilfgaardian Empire</option>
-            <option value="Scoia'tael">Scoia'tael</option>
-            <option value="Skellige">Skellige</option>
-        </select><br><br>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="id">ID del Mazo:</label>
+                    <input type="number" id="id" name="id" required>
+                </div>
 
-        <!-- Menú desplegable para el Líder, llenado dinámicamente -->
-        <label for="leader_id">Carta de Líder:</label><br>
-        <select id="leader_id" name="leader_id" required>
-            <option value="" disabled selected>-- Elige un líder --</option>
-            <!-- Jinja llenará esta sección con las cartas de tipo "Leader" -->
-            {% for leader in leaders %}
-                <option value="{{ leader.id }}">{{ leader.name }} (Facción: {{ leader.faction }})</option>
-            {% endfor %}
-        </select><br><br>
+                <div class="form-group">
+                    <label for="name">Nombre del Mazo:</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+            </div>
 
-        <button type="submit">Crear Mazo</button>
-    </form>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="faction">Facción:</label>
+                    <select id="faction" name="faction" required>
+                        <option value="Northern Realms">Northern Realms</option>
+                        <option value="Monsters">Monsters</option>
+                        <option value="Nilfgaardian Empire">Nilfgaardian Empire</option>
+                        <option value="Scoia'tael">Scoia'tael</option>
+                        <option value="Skellige">Skellige</option>
+                    </select>
+                </div>
+            </div>
 
-    <br>
-    <a href="/">Volver a la colección de cartas</a>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="leader_id">Carta de Líder:</label>
+                    <select id="leader_id" name="leader_id" required>
+                        <option value="" disabled selected>-- Elige un líder --</option>
+                        {% for leader in leaders %}
+                            <option value="{{ leader.id }}">{{ leader.name }} (Facción: {{ leader.faction }})</option>
+                        {% endfor %}
+                    </select>
+                    <small style="color:#aaa; margin-top: 5px;">Asegúrate de que la facción del líder coincida con la del mazo.</small>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button type="submit">Forjar Mazo</button>
+                <a href="/" class="btn-secondary">Cancelar</a>
+            </div>
+
+        </form>
+    </div>
 </body>
 </html>
