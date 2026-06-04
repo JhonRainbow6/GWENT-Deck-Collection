@@ -249,6 +249,10 @@ def create_card_from_form(
         image: Optional[UploadFile] = File(None),
         db: Session = Depends(get_db)
 ):
+    existing_card = db.query(DBCard).filter(DBCard.id == id).first()
+    if existing_card:
+        raise HTTPException(status_code=400, detail="El ID de la carta ya existe en la base de datos.")
+
     image_url = None
 
     if image and image.filename:

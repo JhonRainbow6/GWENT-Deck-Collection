@@ -326,7 +326,7 @@
                         </li>
                         <li class="{% if specials_count <= 5 %}.valid{% else %}.invalid{% endif %}">
                             <span>Cartas Especiales:</span>
-                            <span>{{ specials_count }} / Máx 5</span>
+                            <span>{{ specials_count }} / Max 5</span>
                         </li>
                     </ul>
                 </div>
@@ -338,7 +338,6 @@
                             <img src="{{ leader.image_url }}" alt="{{ leader.name }}" class="card-image-thumbnail">
                         {% endif %}
                         <strong>{{ leader.name }}</strong>
-                        <p style="font-size: 0.85em; color: #aaa; margin: 5px 0;">Habilidad: {{ leader.ability }}</p>
                     {% else %}
                         <p style="color: red;">Error: Líder no encontrado.</p>
                     {% endif %}
