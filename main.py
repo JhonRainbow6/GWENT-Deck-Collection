@@ -447,6 +447,10 @@ def add_card_to_deck_html(
     if card.faction != deck.faction and card.faction != "Neutral":
         raise HTTPException(status_code=400, detail="La carta no pertenece a la facción.")
 
+    total_cards = sum(entry.quantity for entry in db.query(DBDeckCard).filter(DBDeckCard.deck_id == deck_id).all())
+    if total_cards + quantity > 25:
+        raise HTTPException(status_code=400, detail=f"Excedes el límite del mazo. Tienes {total_cards} cartas actualmente (Máx 25).")
+
     if card.type.lower() == 'special':
         current_specials = sum(
             entry.quantity for entry in db.query(DBDeckCard).filter(DBDeckCard.deck_id == deck_id).all()
@@ -483,3 +487,4 @@ def delete_deck_html(deck_id: int, db: Session = Depends(get_db)):
 
     deck_repo.delete(db, id=deck_id)
     return RedirectResponse(url="/", status_code=303)
+
