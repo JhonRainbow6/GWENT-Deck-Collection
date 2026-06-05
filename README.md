@@ -2,8 +2,6 @@
 Un aplicativo web para gestionar una colección de cartas TCG (Gwent) y creación de mazos. Con el uso API REST para crear, listar, editar y eliminar (CRUD) cartas y mazos, validación reglas de construcción de mazos, ofreciendo vistas HTML con formularios para administrar cartas y barajas desde el navegador. Con el uso de bases de datos externas para almacenar y administrar los datos que registre el usuario junto con archivos multimedia.
 
 
-<p align="center"> <img width="300" height="300" alt="frame" src="https://github.com/user-attachments/assets/36834978-bb69-429e-82f1-a96ca2d66067" /> </p>
-
 <img width="1913" height="1034" alt="Interfaz" src="https://github.com/user-attachments/assets/65686f69-fa20-41fa-b7f5-b3ad16943dcd" /> 
 
 ## Organización de Carpetas
